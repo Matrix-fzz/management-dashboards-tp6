@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agricultural Database Management</title>
+    <style>
+        :root {
+            --primary-color: #2e7d32;
+            --secondary-color: #4caf50;
+            --light-color: #e8f5e9;
+            --dark-color: #1b5e20;
+            --text-color: #333;
+            --border-color: #ddd;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: white;
+            border-radius: 5px 5px 0 0;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            background-color: var(--light-color);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            background-color: white;
+            border-bottom: 3px solid var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .tab:hover:not(.active) {
+            background-color: #f0f0f0;
+        }
+        
+        .tab-content {
+            display: none;
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0 0 5px 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: var(--dark-color);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        th {
+            background-color: var(--light-color);
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-edit {
+            background-color: #ff9800;
+        }
+        
+        .btn-delete {
+            background-color: #f44336;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success {
+            background-color: #e8f5e9;
+            color: var(--dark-color);
+            border: 1px solid #c8e6c9;
+        }
+        
+        .alert-error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+        
+        .search-box {
+            margin-bottom: 1rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+            color: #666;
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Agricultural Database Management System</h1>
+    </header>
+    
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="commune">Communes</div>
+            <div class="tab" data-tab="agence">Agencies</div>
+            <div class="tab" data-tab="comptable">Accountants</div>
+            <div class="tab" data-tab="exploitation">Exploitations</div>
+        </div>
+        
+        <!-- Commune Tab -->
+        <div class="tab-content active" id="commune-content">
+            <h2>Manage Communes</h2>
+            <div id="commune-message"></div>
+            <form id="commune-form">
+                <input type="hidden" id="commune-id">
+                <div class="form-group">
+                    <label for="commune-name">Commune Name</label>
+                    <input type="text" id="commune-name" required>
+                </div>
+                <button type="submit">Save Commune</button>
+            </form>
+            
+            <div class="search-box">
+                <input type="text" id="commune-search" placeholder="Search communes...">
+            </div>
+            
+            <table id="commune-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="commune-list">
+                    <!-- Data will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Agency Tab -->
+        <div class="tab-content" id="agence-content">
+            <h2>Manage Agencies</h2>
+            <div id="agence-message"></div>
+            <form id="agence-form">
+                <input type="hidden" id="agence-id">
+                <div class="form-group">
+                    <label for="agence-name">Agency Name</label>
+                    <input type="text" id="agence-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="agence-director">Director</label>
+                    <input type="text" id="agence-director" required>
+                </div>
+                <div class="form-group">
+                    <label for="agence-commune">Commune</label>
+                    <select id="agence-commune" required>
+                        <!-- Options will be loaded from database -->
+                    </select>
+                </div>
+                <button type="submit">Save Agency</button>
+            </form>
+            
+            <div class="search-box">
+                <input type="text" id="agence-search" placeholder="Search agencies...">
+            </div>
+            
+            <table id="agence-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Director</th>
+                        <th>Commune</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="agence-list">
+                    <!-- Data will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Accountant Tab -->
+        <div class="tab-content" id="comptable-content">
+            <h2>Manage Accountants</h2>
+            <div id="comptable-message"></div>
+            <form id="comptable-form">
+                <input type="hidden" id="comptable-id">
+                <div class="form-group">
+                    <label for="comptable-name">Accountant Name</label>
+                    <input type="text" id="comptable-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="comptable-birthdate">Birth Date</label>
+                    <input type="date" id="comptable-birthdate" required>
+                </div>
+                <div class="form-group">
+                    <label for="comptable-phone">Phone Number</label>
+                    <input type="text" id="comptable-phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="comptable-agence">Agency</label>
+                    <select id="comptable-agence" required>
+                        <!-- Options will be loaded from database -->
+                    </select>
+                </div>
+                <button type="submit">Save Accountant</button>
+            </form>
+            
+            <div class="search-box">
+                <input type="text" id="comptable-search" placeholder="Search accountants...">
+            </div>
+            
+            <table id="comptable-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Birth Date</th>
+                        <th>Phone</th>
+                        <th>Agency</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="comptable-list">
+                    <!-- Data will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Exploitation Tab -->
+        <div class="tab-content" id="exploitation-content">
+            <h2>Manage Exploitations</h2>
+            <div id="exploitation-message"></div>
+            <form id="exploitation-form">
+                <input type="hidden" id="exploitation-id">
+                <div class="form-group">
+                    <label for="exploitation-name">Exploitation Name</label>
+                    <input type="text" id="exploitation-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="exploitation-sau">SAU</label>
+                    <input type="number" step="0.01" id="exploitation-sau" required>
+                </div>
+                <div class="form-group">
+                    <label for="exploitation-commune">Commune</label>
+                    <select id="exploitation-commune" required>
+                        <!-- Options will be loaded from database -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="exploitation-comptable">Accountant</label>
+                    <select id="exploitation-comptable" required>
+                        <!-- Options will be loaded from database -->
+                    </select>
+                </div>
+                <button type="submit">Save Exploitation</button>
+            </form>
+            
+            <div class="search-box">
+                <input type="text" id="exploitation-search" placeholder="Search exploitations...">
+            </div>
+            
+            <table id="exploitation-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>SAU</th>
+                        <th>Commune</th>
+                        <th>Accountant</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="exploitation-list">
+                    <!-- Data will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Agricultural Database Management System &copy; 2023</p>
+    </footer>
+
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(`${tabId}-content`).classList.add('active');
+                
+                // Load data for the active tab
+                loadTableData(tabId);
+            });
+        });
+
+        // Form submission handlers
+        document.getElementById('commune-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveCommune();
+        });
+
+        document.getElementById('agence-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveAgence();
+        });
+
+        document.getElementById('comptable-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveComptable();
+        });
+
+        document.getElementById('exploitation-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveExploitation();
+        });
+
+        // Search functionality
+        document.getElementById('commune-search').addEventListener('input', function() {
+            filterTable('commune', this.value);
+        });
+
+        document.getElementById('agence-search').addEventListener('input', function() {
+            filterTable('agence', this.value);
+        });
+
+        document.getElementById('comptable-search').addEventListener('input', function() {
+            filterTable('comptable', this.value);
+        });
+
+        document.getElementById('exploitation-search').addEventListener('input', function() {
+            filterTable('exploitation', this.value);
+        });
+
+        // Load initial data
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTableData('commune');
+            loadDropdowns();
+        });
+
+        // Function to load table data
+        function loadTableData(table) {
+            fetch(`api.php?action=get_${table}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById(`${table}-list`);
+                    tbody.innerHTML = '';
+                    
+                    data.forEach(item => {
+                        const row = document.createElement('tr');
+                        
+                        // Create table cells based on the table type
+                        if (table === 'commune') {
+                            row.innerHTML = `
+                                <td>${item.ID_COMMUNE}</td>
+                                <td>${item.NOM_COMMUNE}</td>
+                                <td class="actions">
+                                    <button class="btn-edit" onclick="editCommune(${item.ID_COMMUNE}, '${item.NOM_COMMUNE}')">Edit</button>
+                                    <button class="btn-delete" onclick="deleteCommune(${item.ID_COMMUNE})">Delete</button>
+                                </td>
+                            `;
+                        } else if (table === 'agence') {
+                            row.innerHTML = `
+                                <td>${item.ID_AGENCE}</td>
+                                <td>${item.NOM_AGENCE}</td>
+                                <td>${item.DIRECTEUR}</td>
+                                <td>${item.NOM_COMMUNE}</td>
+                                <td class="actions">
+                                    <button class="btn-edit" onclick="editAgence('${item.ID_AGENCE}', '${item.NOM_AGENCE}', '${item.DIRECTEUR}', ${item.ID_COMMUNE})">Edit</button>
+                                    <button class="btn-delete" onclick="deleteAgence('${item.ID_AGENCE}')">Delete</button>
+                                </td>
+                            `;
+                        } else if (table === 'comptable') {
+                            row.innerHTML = `
+                                <td>${item.ID_COMPTABLE}</td>
+                                <td>${item.NOM_COMPTABLE}</td>
+                                <td>${item.DATE_NAISSANCE}</td>
+                                <td>${item.NO_TEL}</td>
+                                <td>${item.NOM_AGENCE}</td>
+                                <td class="actions">
+                                    <button class="btn-edit" onclick="editComptable('${item.ID_COMPTABLE}', '${item.NOM_COMPTABLE}', '${item.DATE_NAISSANCE}', '${item.NO_TEL}', '${item.ID_AGENCE}')">Edit</button>
+                                    <button class="btn-delete" onclick="deleteComptable('${item.ID_COMPTABLE}')">Delete</button>
+                                </td>
+                            `;
+                        } else if (table === 'exploitation') {
+                            row.innerHTML = `
+                                <td>${item.ID_EXPLOITATION}</td>
+                                <td>${item.NOM_EXPLOITATION}</td>
+                                <td>${item.SAU}</td>
+                                <td>${item.NOM_COMMUNE}</td>
+                                <td>${item.NOM_COMPTABLE}</td>
+                                <td class="actions">
+                                    <button class="btn-edit" onclick="editExploitation('${item.ID_EXPLOITATION}', '${item.NOM_EXPLOITATION}', ${item.SAU}, ${item.ID_COMMUNE}, '${item.ID_COMPTABLE}')">Edit</button>
+                                    <button class="btn-delete" onclick="deleteExploitation('${item.ID_EXPLOITATION}')">Delete</button>
+                                </td>
+                            `;
+                        }
+                        
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Function to load dropdown options
+        function loadDropdowns() {
+            // Load communes for agency, exploitation, and accountant forms
+            fetch('api.php?action=get_commune')
+                .then(response => response.json())
+                .then(data => {
+                    const communeSelects = [
+                        document.getElementById('agence-commune'),
+                        document.getElementById('exploitation-commune')
+                    ];
+                    
+                    communeSelects.forEach(select => {
+                        select.innerHTML = '<option value="">Select Commune</option>';
+                        data.forEach(commune => {
+                            const option = document.createElement('option');
+                            option.value = commune.ID_COMMUNE;
+                            option.textContent = commune.NOM_COMMUNE;
+                            select.appendChild(option);
+                        });
+                    });
+                });
+
+            // Load agencies for accountant form
+            fetch('api.php?action=get_agence')
+                .then(response => response.json())
+                .then(data => {
+                    const agenceSelect = document.getElementById('comptable-agence');
+                    agenceSelect.innerHTML = '<option value="">Select Agency</option>';
+                    data.forEach(agence => {
+                        const option = document.createElement('option');
+                        option.value = agence.ID_AGENCE;
+                        option.textContent = agence.NOM_AGENCE;
+                        agenceSelect.appendChild(option);
+                    });
+                });
+
+            // Load accountants for exploitation form
+            fetch('api.php?action=get_comptable')
+                .then(response => response.json())
+                .then(data => {
+                    const comptableSelect = document.getElementById('exploitation-comptable');
+                    comptableSelect.innerHTML = '<option value="">Select Accountant</option>';
+                    data.forEach(comptable => {
+                        const option = document.createElement('option');
+                        option.value = comptable.ID_COMPTABLE;
+                        option.textContent = comptable.NOM_COMPTABLE;
+                        comptableSelect.appendChild(option);
+                    });
+                });
+        }
+
+        // Function to filter table data
+        function filterTable(table, searchTerm) {
+            const rows = document.querySelectorAll(`#${table}-list tr`);
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm.toLowerCase())) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // CRUD functions for Communes
+        function saveCommune() {
+            const id = document.getElementById('commune-id').value;
+            const name = document.getElementById('commune-name').value;
+            
+            const action = id ? 'update_commune' : 'add_commune';
+            const data = new URLSearchParams();
+            data.append('id', id);
+            data.append('name', name);
+            
+            fetch('api.php?action=' + action, {
+                method: 'POST',
+                body: data
+            })
+            .then(response => response.json())
+            .then(result => {
+                showMessage('commune', result.message, result.success);
+                if (result.success) {
+                    document.getElementById('commune-form').reset();
+                    loadTableData('commune');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function editCommune(id, name) {
+            document.getElementById('commune-id').value = id;
+            document.getElementById('commune-name').value = name;
+        }
+
+        function deleteCommune(id) {
+            if (confirm('Are you sure you want to delete this commune?')) {
+                fetch(`api.php?action=delete_commune&id=${id}`)
+                    .then(response => response.json())
+                    .then(result => {
+                        showMessage('commune', result.message, result.success);
+                        if (result.success) {
+                            loadTableData('commune');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        }
+
+        // CRUD functions for Agencies
+        function saveAgence() {
+            const id = document.getElementById('agence-id').value;
+            const name = document.getElementById('agence-name').value;
+            const director = document.getElementById('agence-director').value;
+            const communeId = document.getElementById('agence-commune').value;
+            
+            const action = id ? 'update_agence' : 'add_agence';
+            const data = new URLSearchParams();
+            data.append('id', id);
+            data.append('name', name);
+            data.append('director', director);
+            data.append('commune_id', communeId);
+            
+            fetch('api.php?action=' + action, {
+                method: 'POST',
+                body: data
+            })
+            .then(response => response.json())
+            .then(result => {
+                showMessage('agence', result.message, result.success);
+                if (result.success) {
+                    document.getElementById('agence-form').reset();
+                    loadTableData('agence');
+                    loadDropdowns(); // Refresh dropdowns in case new agency was added
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function editAgence(id, name, director, communeId) {
+            document.getElementById('agence-id').value = id;
+            document.getElementById('agence-name').value = name;
+            document.getElementById('agence-director').value = director;
+            document.getElementById('agence-commune').value = communeId;
+        }
+
+        function deleteAgence(id) {
+            if (confirm('Are you sure you want to delete this agency?')) {
+                fetch(`api.php?action=delete_agence&id=${id}`)
+                    .then(response => response.json())
+                    .then(result => {
+                        showMessage('agence', result.message, result.success);
+                        if (result.success) {
+                            loadTableData('agence');
+                            loadDropdowns(); // Refresh dropdowns
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        }
+
+        // CRUD functions for Accountants
+        function saveComptable() {
+            const id = document.getElementById('comptable-id').value;
+            const name = document.getElementById('comptable-name').value;
+            const birthdate = document.getElementById('comptable-birthdate').value;
+            const phone = document.getElementById('comptable-phone').value;
+            const agenceId = document.getElementById('comptable-agence').value;
+            
+            const action = id ? 'update_comptable' : 'add_comptable';
+            const data = new URLSearchParams();
+            data.append('id', id);
+            data.append('name', name);
+            data.append('birthdate', birthdate);
+            data.append('phone', phone);
+            data.append('agence_id', agenceId);
+            
+            fetch('api.php?action=' + action, {
+                method: 'POST',
+                body: data
+            })
+            .then(response => response.json())
+            .then(result => {
+                showMessage('comptable', result.message, result.success);
+                if (result.success) {
+                    document.getElementById('comptable-form').reset();
+                    loadTableData('comptable');
+                    loadDropdowns(); // Refresh dropdowns in case new accountant was added
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function editComptable(id, name, birthdate, phone, agenceId) {
+            document.getElementById('comptable-id').value = id;
+            document.getElementById('comptable-name').value = name;
+            document.getElementById('comptable-birthdate').value = birthdate;
+            document.getElementById('comptable-phone').value = phone;
+            document.getElementById('comptable-agence').value = agenceId;
+        }
+
+        function deleteComptable(id) {
+            if (confirm('Are you sure you want to delete this accountant?')) {
+                fetch(`api.php?action=delete_comptable&id=${id}`)
+                    .then(response => response.json())
+                    .then(result => {
+                        showMessage('comptable', result.message, result.success);
+                        if (result.success) {
+                            loadTableData('comptable');
+                            loadDropdowns(); // Refresh dropdowns
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        }
+
+        // CRUD functions for Exploitations
+        function saveExploitation() {
+            const id = document.getElementById('exploitation-id').value;
+            const name = document.getElementById('exploitation-name').value;
+            const sau = document.getElementById('exploitation-sau').value;
+            const communeId = document.getElementById('exploitation-commune').value;
+            const comptableId = document.getElementById('exploitation-comptable').value;
+            
+            const action = id ? 'update_exploitation' : 'add_exploitation';
+            const data = new URLSearchParams();
+            data.append('id', id);
+            data.append('name', name);
+            data.append('sau', sau);
+            data.append('commune_id', communeId);
+            data.append('comptable_id', comptableId);
+            
+            fetch('api.php?action=' + action, {
+                method: 'POST',
+                body: data
+            })
+            .then(response => response.json())
+            .then(result => {
+                showMessage('exploitation', result.message, result.success);
+                if (result.success) {
+                    document.getElementById('exploitation-form').reset();
+                    loadTableData('exploitation');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function editExploitation(id, name, sau, communeId, comptableId) {
+            document.getElementById('exploitation-id').value = id;
+            document.getElementById('exploitation-name').value = name;
+            document.getElementById('exploitation-sau').value = sau;
+            document.getElementById('exploitation-commune').value = communeId;
+            document.getElementById('exploitation-comptable').value = comptableId;
+        }
+
+        function deleteExploitation(id) {
+            if (confirm('Are you sure you want to delete this exploitation?')) {
+                fetch(`api.php?action=delete_exploitation&id=${id}`)
+                    .then(response => response.json())
+                    .then(result => {
+                        showMessage('exploitation', result.message, result.success);
+                        if (result.success) {
+                            loadTableData('exploitation');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        }
+
+        // Function to show messages
+        function showMessage(type, message, success) {
+            const messageDiv = document.getElementById(`${type}-message`);
+            messageDiv.innerHTML = `<div class="alert ${success ? 'alert-success' : 'alert-error'}">${message}</div>`;
+            
+            // Auto-hide message after 5 seconds
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

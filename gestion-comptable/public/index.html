@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Gestion des Dossiers Comptables</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #43eeee;
+            --primary-light: #4895ef;
+            --secondary-color: #0ca3a3;
+            --accent-color: #f72585;
+            --success-color: #4cc9f0;
+            --warning-color: #f8961e;
+            --danger-color: #e63946;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-400: #ced4da;
+            --gray-500: #adb5bd;
+            --gray-600: #6c757d;
+            --gray-700: #495057;
+            --gray-800: #343a40;
+            --gray-900: #212529;
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --border-radius-lg: 16px;
+            --box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --box-shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --sidebar-width: 280px;
+            --header-height: 70px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--gray-800);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            color: white;
+            padding: 0;
+            transition: var(--transition);
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            box-shadow: var(--box-shadow);
+        }
+
+        .logo {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            list-style: none;
+            padding: 0 15px;
+        }
+
+        .nav-links li {
+            margin-bottom: 8px;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-links a.active {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-links i {
+            margin-right: 12px;
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 15px 0;
+        }
+
+        .header h2 {
+            font-weight: 700;
+            color: var(--gray-800);
+            font-size: 1.8rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--success-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Cards */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--box-shadow-lg);
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.4rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-icon.blue {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+        }
+
+        .card-icon.green {
+            background: linear-gradient(135deg, var(--success-color), #4cc9f0);
+        }
+
+        .card-icon.orange {
+            background: linear-gradient(135deg, var(--warning-color), #f9c74f);
+        }
+
+        .card-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--gray-800), var(--gray-700));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-description {
+            color: var(--gray-500);
+            font-size: 0.9rem;
+        }
+
+        /* Tables */
+        .table-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            box-shadow: 0 4px 6px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(67, 97, 238, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #4cc9f0);
+            color: white;
+            box-shadow: 0 4px 6px rgba(76, 201, 240, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(76, 201, 240, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color), #f72585);
+            color: white;
+            box-shadow: 0 4px 6px rgba(230, 57, 70, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(230, 57, 70, 0.4);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 16px 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        th {
+            background-color: var(--gray-100);
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tr {
+            transition: var(--transition);
+        }
+
+        tr:hover {
+            background-color: var(--gray-50);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .action-btn.view {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .action-btn.edit {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .action-btn.delete {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: var(--border-radius-lg);
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--box-shadow-lg);
+            animation: modalAppear 0.3s ease-out;
+        }
+
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-500);
+            transition: var(--transition);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background-color: var(--gray-200);
+            color: var(--gray-700);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .detail-section {
+            margin-bottom: 30px;
+        }
+
+        .detail-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--gray-800);
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .detail-item {
+            margin-bottom: 10px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 1rem;
+            color: var(--gray-800);
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius-sm);
+            font-size: 1rem;
+            transition: var(--transition);
+            background-color: white;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 80px;
+            }
+            
+            .sidebar .logo h1,
+            .sidebar .nav-links span {
+                display: none;
+            }
+            
+            .sidebar .logo {
+                justify-content: center;
+                padding: 20px 0;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+                width: calc(100% - 80px);
+            }
+            
+            .nav-links a {
+                justify-content: center;
+                padding: 16px;
+            }
+            
+            .nav-links i {
+                margin-right: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .nav-links {
+                display: flex;
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+            
+            .nav-links li {
+                margin-bottom: 0;
+                margin-right: 10px;
+            }
+            
+            .nav-links a {
+                white-space: nowrap;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .user-info {
+                align-self: flex-end;
+            }
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1100;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: transform 0.3s, opacity 0.3s;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        .toast.success .toast-icon {
+            background: var(--success-color);
+        }
+
+        .toast.error .toast-icon {
+            background: var(--danger-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h1>Gestion Comptable</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" class="active" data-section="dashboard"><i class="fas fa-tachometer-alt"></i> <span>Tableau de bord</span></a></li>
+                <li><a href="#" data-section="dossiers"><i class="fas fa-folder"></i> <span>Dossiers</span></a></li>
+                <li><a href="#" data-section="comptables"><i class="fas fa-user-tie"></i> <span>Comptables</span></a></li>
+                <li><a href="#" data-section="exploitations"><i class="fas fa-tractor"></i> <span>Exploitations</span></a></li>
+                <li><a href="#" data-section="agences"><i class="fas fa-building"></i> <span>Agences</span></a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h2 id="page-title">Tableau de bord</h2>
+                <div class="user-info">
+                    <div class="user-avatar">AD</div>
+                    <span>Admin</span>
+                </div>
+            </div>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="content-section">
+                <div class="cards">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Dossiers</div>
+                            <div class="card-icon blue">
+                                <i class="fas fa-folder"></i>
+                            </div>
+                        </div>
+                        <div class="card-value" id="dossiers-count">0</div>
+                        <div class="card-description">Total des dossiers</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Comptables</div>
+                            <div class="card-icon green">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                        </div>
+                        <div class="card-value" id="comptables-count">0</div>
+                        <div class="card-description">Comptables actifs</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Exploitations</div>
+                            <div class="card-icon orange">
+                                <i class="fas fa-tractor"></i>
+                            </div>
+                        </div>
+                        <div class="card-value" id="exploitations-count">0</div>
+                        <div class="card-description">Exploitations gérées</div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="cards">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Statistiques</div>
+                            <div class="card-icon blue">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                        </div>
+                        <div class="card-description" style="padding: 10px 20px;">
+                            <canvas id="stats-bar-chart" height="120"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Comptables par agence</div>
+                            <div class="card-icon green">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                        </div>
+                        <div class="card-description" style="padding: 10px 20px;">
+                            <canvas id="agences-pie-chart" height="120"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">Dossiers récents</div>
+                        <button class="btn btn-primary" id="add-dossier-btn">
+                            <i class="fas fa-plus"></i> Nouveau dossier
+                        </button>
+                    </div>
+                    <table id="recent-dossiers-table">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Comptable</th>
+                                <th>Agence</th>
+                                <th>Date création</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Les données seront chargées ici -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Dossiers Section -->
+            <section id="dossiers-section" class="content-section" style="display: none;">
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">Liste des dossiers</div>
+                        <button class="btn btn-primary" id="add-dossier-btn-2">
+                            <i class="fas fa-plus"></i> Nouveau dossier
+                        </button>
+                    </div>
+                    <table id="dossiers-table">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Comptable</th>
+                                <th>Agence</th>
+                                <th>Date création</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Les données seront chargées ici -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Comptables Section -->
+            <section id="comptables-section" class="content-section" style="display: none;">
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">Liste des comptables</div>
+                        <button class="btn btn-primary" id="add-comptable-btn">
+                            <i class="fas fa-plus"></i> Nouveau comptable
+                        </button>
+                    </div>
+                    <table id="comptables-table">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Âge</th>
+                                <th>Téléphone</th>
+                                <th>Agence</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Les données seront chargées ici -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Exploitations Section -->
+            <section id="exploitations-section" class="content-section" style="display: none;">
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">Liste des exploitations</div>
+                        <button class="btn btn-primary" id="add-exploitation-btn">
+                            <i class="fas fa-plus"></i> Nouvelle exploitation
+                        </button>
+                    </div>
+                    <table id="exploitations-table">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Commune</th>
+                                <th>SAU</th>
+                                <th>Comptable</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Les données seront chargées ici -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Agences Section -->
+            <section id="agences-section" class="content-section" style="display: none;">
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">Liste des agences</div>
+                        <button class="btn btn-primary" id="add-agence-btn">
+                            <i class="fas fa-plus"></i> Nouvelle agence
+                        </button>
+                    </div>
+                    <table id="agences-table">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Ville</th>
+                                <th>Directeur</th>
+                                <th>Nombre de comptables</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Les données seront chargées ici -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Modal pour afficher les détails -->
+    <div class="modal" id="detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Détails</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Le contenu sera chargé ici -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour ajouter/modifier -->
+    <div class="modal" id="form-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="form-modal-title">Ajouter</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="entity-form">
+                    <!-- Le formulaire sera chargé ici -->
+                </form>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-danger" id="cancel-btn">Annuler</button>
+                    <button type="button" class="btn btn-success" id="save-btn">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast">
+        <div class="toast-icon">
+            <i class="fas fa-check"></i>
+        </div>
+        <div class="toast-message" id="toast-message">Opération réussie</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    // API base URL
+    const API_BASE = 'http://localhost:3000/api';
+
+    // État de l'application
+    let currentSection = 'dashboard';
+    let currentEntity = null;
+    let currentAction = 'add'; // 'add' ou 'edit'
+    let currentEditId = null;
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', function() {
+        // Navigation
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const section = this.getAttribute('data-section');
+                showSection(section);
+                
+                // Mettre à jour la navigation active
+                document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Boutons d'ajout
+        document.getElementById('add-dossier-btn').addEventListener('click', () => showForm('dossier'));
+        document.getElementById('add-dossier-btn-2').addEventListener('click', () => showForm('dossier'));
+        document.getElementById('add-comptable-btn').addEventListener('click', () => showForm('comptable'));
+        document.getElementById('add-exploitation-btn').addEventListener('click', () => showForm('exploitation'));
+        document.getElementById('add-agence-btn').addEventListener('click', () => showForm('agence'));
+
+        // Boutons de modal
+        document.querySelectorAll('.close-btn').forEach(btn => {
+            btn.addEventListener('click', closeModal);
+        });
+
+        document.getElementById('cancel-btn').addEventListener('click', closeModal);
+        document.getElementById('save-btn').addEventListener('click', saveEntity);
+
+        // Fermer la modal en cliquant à l'extérieur
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+        });
+
+        // Charger les données initiales
+        loadDashboardData();
+        loadDossiers();
+        loadComptables();
+        loadExploitations();
+        loadAgences();
+    });
+
+    // API functions
+    async function apiGet(url) {
+        const response = await fetch(`${API_BASE}${url}`);
+        return await response.json();
+    }
+
+    async function apiPost(url, data) {
+        const response = await fetch(`${API_BASE}${url}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        return await response.json();
+    }
+
+    async function apiPut(url, data) {
+        const response = await fetch(`${API_BASE}${url}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        return await response.json();
+    }
+
+    async function apiDelete(url) {
+        const response = await fetch(`${API_BASE}${url}`, {
+            method: 'DELETE'
+        });
+        return await response.json();
+    }
+
+    // Afficher une section
+    function showSection(section) {
+        currentSection = section;
+        
+        // Masquer toutes les sections
+        document.querySelectorAll('.content-section').forEach(sec => {
+            sec.style.display = 'none';
+        });
+        
+        // Afficher la section demandée
+        document.getElementById(`${section}-section`).style.display = 'block';
+        
+        // Mettre à jour le titre de la page
+        const titles = {
+            dashboard: 'Tableau de bord',
+            dossiers: 'Gestion des dossiers',
+            comptables: 'Gestion des comptables',
+            exploitations: 'Gestion des exploitations',
+            agences: 'Gestion des agences'
+        };
+        document.getElementById('page-title').textContent = titles[section] || 'Tableau de bord';
+    }
+
+    // Fermer les modales
+    function closeModal() {
+        document.getElementById('detail-modal').style.display = 'none';
+        document.getElementById('form-modal').style.display = 'none';
+        currentEditId = null;
+    }
+
+    // Afficher une modal de détails
+    async function showDetails(entityType, id) {
+        try {
+            const entity = await apiGet(`/${entityType}/${id}`);
+            if (!entity) return;
+
+            const modal = document.getElementById('detail-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            
+            modalTitle.textContent = `Détails ${getEntityName(entityType)}`;
+            modalBody.innerHTML = '';
+
+            // Informations principales
+            let mainInfoHtml = `<div class="detail-section">
+                <h4 class="detail-title">Informations principales</h4>
+                <div class="detail-grid">`;
+
+            for (const key in entity) {
+                if (key !== 'id' && !key.includes('_nom')) {
+                    const label = getFieldLabel(key);
+                    let value = entity[key];
+                    
+                    // Formater les valeurs spéciales
+                    if (key === 'agence_id') {
+                        value = entity.agence_nom || 'Non assignée';
+                    } else if (key === 'comptable_id') {
+                        value = entity.comptable_nom || 'Non assigné';
+                    } else if (key === 'sau') {
+                        value = `${value} ha`;
+                    } else if (key === 'age') {
+                        value = `${value} ans`;
+                    } else if (key === 'date_creation') {
+                        value = formatDate(value);
+                    }
+                    
+                    mainInfoHtml += `
+                        <div class="detail-item">
+                            <div class="detail-label">${label}</div>
+                            <div class="detail-value">${value}</div>
+                        </div>
+                    `;
+                }
+            }
+            
+            mainInfoHtml += `</div></div>`;
+            modalBody.innerHTML += mainInfoHtml;
+
+            modal.style.display = 'flex';
+        } catch (error) {
+            console.error('Error showing details:', error);
+            showToast('Erreur lors du chargement des détails', 'error');
+        }
+    }
+
+    // Afficher le formulaire d'ajout/modification
+    async function showForm(entityType, id = null) {
+        currentEntity = entityType;
+        currentAction = id ? 'edit' : 'add';
+        currentEditId = id;
+        
+        const modal = document.getElementById('form-modal');
+        const modalTitle = document.getElementById('form-modal-title');
+        const form = document.getElementById('entity-form');
+        
+        modalTitle.textContent = `${currentAction === 'add' ? 'Ajouter' : 'Modifier'} ${getEntityName(entityType)}`;
+        form.innerHTML = '';
+        
+        try {
+            // Récupérer les données pour les listes déroulantes
+            const [agences, comptables] = await Promise.all([
+                apiGet('/agences'),
+                apiGet('/comptables')
+            ]);
+            
+            // Déterminer les champs selon le type d'entité
+            let fields = [];
+            
+            if (entityType === 'dossier') {
+                fields = [
+                    { name: 'nom', label: 'Nom du dossier', type: 'text', required: true },
+                    { name: 'date_creation', label: 'Date de création', type: 'date', required: true },
+                    { name: 'comptable_id', label: 'Comptable', type: 'select', options: comptables, required: true },
+                    { name: 'agence_id', label: 'Agence', type: 'select', options: agences, required: true }
+                ];
+            } else if (entityType === 'comptable') {
+                fields = [
+                    { name: 'nom', label: 'Nom du comptable', type: 'text', required: true },
+                    { name: 'age', label: 'Âge', type: 'number', required: true },
+                    { name: 'telephone', label: 'Téléphone', type: 'text', required: true },
+                    { name: 'agence_id', label: 'Agence', type: 'select', options: agences, required: true }
+                ];
+            } else if (entityType === 'exploitation') {
+                fields = [
+                    { name: 'nom', label: 'Nom de l\'exploitation', type: 'text', required: true },
+                    { name: 'commune', label: 'Commune', type: 'text', required: true },
+                    { name: 'sau', label: 'SAU (ha)', type: 'number', required: true },
+                    { name: 'comptable_id', label: 'Comptable', type: 'select', options: comptables, required: true }
+                ];
+            } else if (entityType === 'agence') {
+                fields = [
+                    { name: 'nom', label: 'Nom de l\'agence', type: 'text', required: true },
+                    { name: 'ville', label: 'Ville', type: 'text', required: true },
+                    { name: 'directeur', label: 'Directeur', type: 'text', required: true }
+                ];
+            }
+            
+            // Générer le formulaire
+            fields.forEach(field => {
+                const formGroup = document.createElement('div');
+                formGroup.className = 'form-group';
+                
+                const label = document.createElement('label');
+                label.className = 'form-label';
+                label.textContent = field.label;
+                label.htmlFor = field.name;
+                
+                let input;
+                
+                if (field.type === 'select') {
+                    input = document.createElement('select');
+                    input.className = 'form-control';
+                    input.id = field.name;
+                    input.name = field.name;
+                    input.required = field.required;
+                    
+                    // Option par défaut
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = `Sélectionner ${field.label.toLowerCase()}`;
+                    input.appendChild(defaultOption);
+                    
+                    // Options
+                    field.options.forEach(option => {
+                        const opt = document.createElement('option');
+                        opt.value = option.id;
+                        opt.textContent = option.nom;
+                        input.appendChild(opt);
+                    });
+                } else {
+                    input = document.createElement('input');
+                    input.type = field.type;
+                    input.className = 'form-control';
+                    input.id = field.name;
+                    input.name = field.name;
+                    input.required = field.required;
+                }
+                
+                formGroup.appendChild(label);
+                formGroup.appendChild(input);
+                form.appendChild(formGroup);
+            });
+            
+            // Remplir les données si en mode édition
+            if (id) {
+                const entity = await apiGet(`/${entityType}s/${id}`);
+                if (entity) {
+                    fields.forEach(field => {
+                        const input = document.getElementById(field.name);
+                        if (input) {
+                            input.value = entity[field.name];
+                        }
+                    });
+                }
+            }
+            
+            modal.style.display = 'flex';
+        } catch (error) {
+            console.error('Error showing form:', error);
+            showToast('Erreur lors du chargement du formulaire', 'error');
+        }
+    }
+
+    // Sauvegarder une entité
+    async function saveEntity() {
+        const saveBtn = document.getElementById('save-btn');
+        const originalText = saveBtn.innerHTML;
+        
+        try {
+            // Afficher l'indicateur de chargement
+            saveBtn.innerHTML = '<div class="loading"></div> Enregistrement...';
+            saveBtn.disabled = true;
+            
+            const form = document.getElementById('entity-form');
+            const formData = new FormData(form);
+            const entityData = {};
+            
+            for (const [key, value] of formData.entries()) {
+                entityData[key] = value;
+            }
+            
+            // Convertir les nombres
+            if (entityData.age) entityData.age = parseInt(entityData.age);
+            if (entityData.sau) entityData.sau = parseInt(entityData.sau);
+            if (entityData.comptable_id) entityData.comptable_id = parseInt(entityData.comptable_id);
+            if (entityData.agence_id) entityData.agence_id = parseInt(entityData.agence_id);
+
+            let result;
+            if (currentAction === 'add') {
+                result = await apiPost(`/${currentEntity}s`, entityData);
+            } else {
+                result = await apiPut(`/${currentEntity}s/${currentEditId}`, entityData);
+            }
+            
+            // Mettre à jour l'affichage
+            switch(currentEntity) {
+                case 'dossier':
+                    await loadDossiers();
+                    await loadDashboardData();
+                    break;
+                case 'comptable':
+                    await loadComptables();
+                    await loadDashboardData();
+                    break;
+                case 'exploitation':
+                    await loadExploitations();
+                    await loadDashboardData();
+                    break;
+                case 'agence':
+                    await loadAgences();
+                    break;
+            }
+            
+            closeModal();
+            showToast(`${getEntityName(currentEntity)} ${currentAction === 'add' ? 'ajouté(e)' : 'modifié(e)'} avec succès`, 'success');
+        } catch (error) {
+            console.error('Error saving entity:', error);
+            showToast('Erreur lors de la sauvegarde', 'error');
+        } finally {
+            // Restaurer le bouton
+            saveBtn.innerHTML = originalText;
+            saveBtn.disabled = false;
+        }
+    }
+
+    // Supprimer une entité
+    async function deleteEntity(entityType, id) {
+        if (confirm(`Êtes-vous sûr de vouloir supprimer cet élément ?`)) {
+            try {
+                await apiDelete(`/${entityType}s/${id}`);
+                
+                // Mettre à jour l'affichage
+                switch(entityType) {
+                    case 'dossier':
+                        await loadDossiers();
+                        await loadDashboardData();
+                        break;
+                    case 'comptable':
+                        await loadComptables();
+                        await loadDashboardData();
+                        break;
+                    case 'exploitation':
+                        await loadExploitations();
+                        await loadDashboardData();
+                        break;
+                    case 'agence':
+                        await loadAgences();
+                        break;
+                }
+                
+                showToast('Élément supprimé avec succès', 'success');
+            } catch (error) {
+                console.error('Error deleting entity:', error);
+                showToast('Erreur lors de la suppression', 'error');
+            }
+        }
+    }
+
+    // Charger les données du tableau de bord
+    async function loadDashboardData() {
+        try {
+            const stats = await apiGet('/dashboard/stats');
+            document.getElementById('dossiers-count').textContent = stats.dossiers;
+            document.getElementById('comptables-count').textContent = stats.comptables;
+            document.getElementById('exploitations-count').textContent = stats.exploitations;
+            // Render bar chart for overall stats
+            try {
+                createOrUpdateBarChart(stats);
+            } catch (e) {
+                console.warn('Chart render skipped (bar):', e);
+            }
+            
+            // Charger les dossiers récents
+            let dossiers = await apiGet('/dossiers');
+            // S'assurer que les dossiers sont triés par date de création (du plus récent au plus ancien)
+            if (Array.isArray(dossiers)) {
+                dossiers.sort((a, b) => {
+                    const dateA = new Date(a.date_creation || a.created_at);
+                    const dateB = new Date(b.date_creation || b.created_at);
+                    return dateB - dateA; // plus récent d'abord
+                });
+            }
+            const tableBody = document.querySelector('#recent-dossiers-table tbody');
+            tableBody.innerHTML = '';
+            
+            dossiers.slice(0, 5).forEach(dossier => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${dossier.nom}</td>
+                    <td>${dossier.comptable_nom || 'Non assigné'}</td>
+                    <td>${dossier.agence_nom || 'Non assignée'}</td>
+                    <td>${formatDate(dossier.date_creation)}</td>
+                    <td class="action-buttons">
+                        <button class="action-btn view" onclick="showDetails('dossiers', ${dossier.id})">Voir</button>
+                        <button class="action-btn edit" onclick="showForm('dossier', ${dossier.id})">Modifier</button>
+                        <button class="action-btn delete" onclick="deleteEntity('dossier', ${dossier.id})">Supprimer</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error loading dashboard data:', error);
+        }
+    }
+
+    // Charger les dossiers
+    async function loadDossiers() {
+        try {
+            let dossiers = await apiGet('/dossiers');
+            const tableBody = document.querySelector('#dossiers-table tbody');
+            tableBody.innerHTML = '';
+            // Trier les dossiers du plus récent au plus ancien
+            if (Array.isArray(dossiers)) {
+                dossiers.sort((a, b) => {
+                    const dateA = new Date(a.date_creation || a.created_at);
+                    const dateB = new Date(b.date_creation || b.created_at);
+                    return dateB - dateA;
+                });
+            }
+            
+            dossiers.forEach(dossier => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${dossier.nom}</td>
+                    <td>${dossier.comptable_nom || 'Non assigné'}</td>
+                    <td>${dossier.agence_nom || 'Non assignée'}</td>
+                    <td>${formatDate(dossier.date_creation)}</td>
+                    <td class="action-buttons">
+                        <button class="action-btn view" onclick="showDetails('dossiers', ${dossier.id})">Voir</button>
+                        <button class="action-btn edit" onclick="showForm('dossier', ${dossier.id})">Modifier</button>
+                        <button class="action-btn delete" onclick="deleteEntity('dossier', ${dossier.id})">Supprimer</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error loading dossiers:', error);
+        }
+    }
+
+    // Charger les comptables
+    async function loadComptables() {
+        try {
+            const comptables = await apiGet('/comptables');
+            const tableBody = document.querySelector('#comptables-table tbody');
+            tableBody.innerHTML = '';
+            
+            comptables.forEach(comptable => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${comptable.nom}</td>
+                    <td>${comptable.age} ans</td>
+                    <td>${comptable.telephone}</td>
+                    <td>${comptable.agence_nom || 'Non assignée'}</td>
+                    <td class="action-buttons">
+                        <button class="action-btn view" onclick="showDetails('comptables', ${comptable.id})">Voir</button>
+                        <button class="action-btn edit" onclick="showForm('comptable', ${comptable.id})">Modifier</button>
+                        <button class="action-btn delete" onclick="deleteEntity('comptable', ${comptable.id})">Supprimer</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error loading comptables:', error);
+        }
+    }
+
+    // Charger les exploitations
+    async function loadExploitations() {
+        try {
+            const exploitations = await apiGet('/exploitations');
+            const tableBody = document.querySelector('#exploitations-table tbody');
+            tableBody.innerHTML = '';
+            
+            exploitations.forEach(exploitation => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${exploitation.nom}</td>
+                    <td>${exploitation.commune}</td>
+                    <td>${exploitation.sau} ha</td>
+                    <td>${exploitation.comptable_nom || 'Non assigné'}</td>
+                    <td class="action-buttons">
+                        <button class="action-btn view" onclick="showDetails('exploitations', ${exploitation.id})">Voir</button>
+                        <button class="action-btn edit" onclick="showForm('exploitation', ${exploitation.id})">Modifier</button>
+                        <button class="action-btn delete" onclick="deleteEntity('exploitation', ${exploitation.id})">Supprimer</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error loading exploitations:', error);
+        }
+    }
+
+    // Charger les agences
+    async function loadAgences() {
+        try {
+            // Use the agences-with-stats endpoint which includes the comptables count
+            const agences = await apiGet('/agences-with-stats');
+            const tableBody = document.querySelector('#agences-table tbody');
+            tableBody.innerHTML = '';
+            
+            agences.forEach(agence => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${agence.nom}</td>
+                    <td>${agence.ville}</td>
+                    <td>${agence.directeur}</td>
+                    <td>${agence.nombre_comptables != null ? agence.nombre_comptables : 0}</td>
+                    <td class="action-buttons">
+                        <button class="action-btn view" onclick="showDetails('agences', ${agence.id})">Voir</button>
+                        <button class="action-btn edit" onclick="showForm('agence', ${agence.id})">Modifier</button>
+                        <button class="action-btn delete" onclick="deleteEntity('agence', ${agence.id})">Supprimer</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            // Render pie chart showing comptables per agence
+            try {
+                createOrUpdatePieChart(agences);
+            } catch (e) {
+                console.warn('Chart render skipped (pie):', e);
+            }
+        } catch (error) {
+            console.error('Error loading agences:', error);
+        }
+    }
+
+    // Fonctions utilitaires
+    // Chart instances
+    let statsBarChart = null;
+    let agencesPieChart = null;
+
+    function createOrUpdateBarChart(stats) {
+        const ctx = document.getElementById('stats-bar-chart');
+        if (!ctx) return;
+
+        const data = {
+            labels: ['Dossiers', 'Comptables', 'Exploitations'],
+            datasets: [{
+                label: 'Nombre',
+                data: [stats.dossiers || 0, stats.comptables || 0, stats.exploitations || 0],
+                backgroundColor: [
+                    'rgba(67, 97, 238, 0.8)',
+                    'rgba(76, 201, 240, 0.8)',
+                    'rgba(248, 150, 30, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(67, 97, 238, 1)',
+                    'rgba(76, 201, 240, 1)',
+                    'rgba(248, 150, 30, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        const config = {
+            type: 'bar',
+            data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 13 },
+                        padding: 10,
+                        cornerRadius: 8
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        };
+
+        if (statsBarChart) {
+            statsBarChart.data = data;
+            statsBarChart.update();
+        } else {
+            statsBarChart = new Chart(ctx.getContext('2d'), config);
+        }
+    }
+
+    function createOrUpdatePieChart(agences) {
+        const ctx = document.getElementById('agences-pie-chart');
+        if (!ctx) return;
+
+        const labels = agences.map(a => a.nom || `Agence ${a.id}`);
+        const dataValues = agences.map(a => parseInt(a.nombre_comptables) || 0);
+
+        const data = {
+            labels,
+            datasets: [{
+                data: dataValues,
+                backgroundColor: [
+                    'rgba(67, 97, 238, 0.8)',
+                    'rgba(76, 201, 240, 0.8)',
+                    'rgba(248, 150, 30, 0.8)',
+                    'rgba(230, 57, 70, 0.8)',
+                    'rgba(106, 76, 147, 0.8)',
+                    'rgba(41, 171, 135, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(67, 97, 238, 1)',
+                    'rgba(76, 201, 240, 1)',
+                    'rgba(248, 150, 30, 1)',
+                    'rgba(230, 57, 70, 1)',
+                    'rgba(106, 76, 147, 1)',
+                    'rgba(41, 171, 135, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        const config = {
+            type: 'pie',
+            data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 13 },
+                        padding: 10,
+                        cornerRadius: 8
+                    }
+                }
+            }
+        };
+
+        if (agencesPieChart) {
+            agencesPieChart.data = data;
+            agencesPieChart.update();
+        } else {
+            agencesPieChart = new Chart(ctx.getContext('2d'), config);
+        }
+    }
+
+    function getEntityName(entityType) {
+        const names = {
+            dossiers: 'du dossier',
+            comptables: 'du comptable',
+            exploitations: 'de l\'exploitation',
+            agences: 'de l\'agence',
+            dossier: 'un dossier',
+            comptable: 'un comptable',
+            exploitation: 'une exploitation',
+            agence: 'une agence'
+        };
+        return names[entityType] || '';
+    }
+
+    function getFieldLabel(fieldName) {
+        const labels = {
+            nom: 'Nom',
+            commune: 'Commune',
+            sau: 'SAU',
+            age: 'Âge',
+            telephone: 'Téléphone',
+            directeur: 'Directeur',
+            ville: 'Ville',
+            date_creation: 'Date de création',
+            comptable_id: 'Comptable',
+            agence_id: 'Agence'
+        };
+        return labels[fieldName] || fieldName;
+    }
+
+    function formatDate(dateString) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('fr-FR', options);
+    }
+
+    // Toast notification function
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+        
+        toastMessage.textContent = message;
+        toast.className = `toast ${type}`;
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+</script>
+</body>
+</html>
